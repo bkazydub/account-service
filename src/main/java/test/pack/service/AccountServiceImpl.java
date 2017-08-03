@@ -16,13 +16,15 @@ public class AccountServiceImpl implements AccountService {
 
     private static final Logger log = Logger.getLogger(AccountServiceImpl.class.getName());
     private static final String MESSAGE_INSUFFICIENT_FUNDS = "Balance can't be changed by %s for account %d. Reason: insufficient funds.";
+    private static final String MESSAGE_ACCOUNT_NOT_FOUND = "There is no account with id '%d'";
     private static final String MESSAGE_SQL_FAILED = "Unable to perform update balance action for account with id: %d. Reason: %s";
 
     @Autowired
     private AccountRepository accountRepository;
 
     @Override
-    public void updateBalance(long accountId, BigDecimal amount) throws InsufficientFundsException {
+    public void updateBalance(long accountId, BigDecimal amount)
+            throws InsufficientFundsException, AccountNotFoundException {
         try {
             BigDecimal currentBalance = accountRepository.getCurrentBalance(accountId);
             // Note: it is supposed that currentBalance is positive or equal to 0.
@@ -33,10 +35,22 @@ public class AccountServiceImpl implements AccountService {
             accountRepository.updateBalance(accountId, amount);
         } catch (EntryNotFoundException e) {
             log.info("There is no account with id: " + accountId);
-            // It'd be nice to throw something...
+            throw new AccountNotFoundException(String.format(MESSAGE_ACCOUNT_NOT_FOUND, accountId));
         } catch (RepositoryException e) {
             // I suppose that only logging will do ATM
             log.warning(String.format(MESSAGE_SQL_FAILED, accountId, e.getMessage()));
+        }
+    }
+
+    @Override
+    public BigDecimal getCurrentBalance(long accountId) throws AccountNotFoundException {
+        try {
+            return accountRepository.getCurrentBalance(accountId);
+        } catch (EntryNotFoundException e) {
+            throw new AccountNotFoundException(String.format(MESSAGE_ACCOUNT_NOT_FOUND, accountId));
+        } catch (RepositoryException e) {
+            // null is returned because I assume that existing but empty accounts should have zero balance.
+            return null;
         }
     }
 }
