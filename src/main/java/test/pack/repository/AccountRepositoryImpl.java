@@ -29,8 +29,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public BigDecimal getCurrentBalance(long accountId) throws RepositoryException {
         PreparedStatement statement = null;
-        try {
-            Connection con = dataSource.getConnection();
+        try (Connection con = dataSource.getConnection()) {
             statement = con.prepareStatement(SQL_SELECT_BALANCE);
             statement.setLong(1, accountId);
             ResultSet rs = statement.executeQuery();
@@ -60,8 +59,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public boolean updateBalance(long accountId, BigDecimal changeByAmount) throws RepositoryException {
         PreparedStatement statement = null;
-        try {
-            Connection con = dataSource.getConnection();
+        try (Connection con = dataSource.getConnection()) {
             statement = con.prepareStatement(SQL_UPDATE_BALANCE);
             statement.setBigDecimal(1, changeByAmount);
             statement.setLong(2, accountId);

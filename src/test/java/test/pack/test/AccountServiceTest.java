@@ -18,9 +18,10 @@ import test.pack.service.InsufficientFundsException;
 
 import java.math.BigDecimal;
 
+import static org.springframework.test.annotation.DirtiesContext.MethodMode.AFTER_METHOD;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = AppConfig.class)
-@DirtiesContext
 @TestExecutionListeners(value = {
         DirtiesContextTestExecutionListener.class,
         DependencyInjectionTestExecutionListener.class
@@ -43,6 +44,7 @@ public class AccountServiceTest {
     }
 
     @Test
+    @DirtiesContext(methodMode = AFTER_METHOD)
     public void changeByPositiveAmount() {
         try {
             final int accountId = 1;
@@ -58,6 +60,7 @@ public class AccountServiceTest {
     }
 
     @Test
+    @DirtiesContext(methodMode = AFTER_METHOD)
     public void changeByNegativeAmountBalanceIsSufficient() {
         try {
             final int accountId = 2;
