@@ -19,8 +19,12 @@ public class AccountRepositoryImpl implements AccountRepository {
     // update query to increment/decrement current balance depending on whether given parameter is positive or negative.
     private static final String SQL_UPDATE_BALANCE = "UPDATE account a SET a.money = a.money + ? WHERE a.id = ?";
 
-    @Autowired
     private DataSource dataSource;
+
+    @Autowired
+    public AccountRepositoryImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Override
     public BigDecimal getCurrentBalance(long accountId) throws RepositoryException {

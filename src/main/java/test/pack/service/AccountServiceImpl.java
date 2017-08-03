@@ -19,8 +19,12 @@ public class AccountServiceImpl implements AccountService {
     private static final String MESSAGE_ACCOUNT_NOT_FOUND = "There is no account with id '%d'";
     private static final String MESSAGE_SQL_FAILED = "Unable to perform update balance action for account with id: %d. Reason: %s";
 
-    @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    public AccountServiceImpl(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
 
     @Override
     public void updateBalance(long accountId, BigDecimal amount)
