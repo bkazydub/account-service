@@ -27,16 +27,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void updateBalance(long accountId, BigDecimal amount)
+    public void updateBalance(long accountId, BigDecimal changeBalanceByAmount)
             throws InsufficientFundsException, AccountNotFoundException {
         try {
             BigDecimal currentBalance = accountRepository.getCurrentBalance(accountId);
             // Note: it is supposed that currentBalance is positive or equal to 0.
-            if (currentBalance.add(amount).compareTo(BigDecimal.ZERO) < 0) {
+            BigDecimal updatedBalance = currentBalance.add(changeBalanceByAmount);
+            if (updatedBalance.compareTo(BigDecimal.ZERO) < 0) {
                 // the account has insufficient funds.
-                throw new InsufficientFundsException(String.format(MESSAGE_INSUFFICIENT_FUNDS, amount.toString(), accountId));
+                throw new InsufficientFundsException(String.format(MESSAGE_INSUFFICIENT_FUNDS, changeBalanceByAmount.toString(), accountId));
             }
-            accountRepository.updateBalance(accountId, amount);
+            accountRepository.updateBalance(accountId, updatedBalance);
         } catch (EntryNotFoundException e) {
             log.info("There is no account with id: " + accountId);
             throw new AccountNotFoundException(String.format(MESSAGE_ACCOUNT_NOT_FOUND, accountId));

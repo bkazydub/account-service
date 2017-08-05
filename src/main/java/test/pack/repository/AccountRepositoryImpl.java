@@ -16,8 +16,7 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     private static final Logger log = Logger.getLogger(AccountRepositoryImpl.class.getName());
     private static final String SQL_SELECT_BALANCE = "SELECT money FROM account a WHERE a.id = ?";
-    // update query to increment/decrement current balance depending on whether given parameter is positive or negative.
-    private static final String SQL_UPDATE_BALANCE = "UPDATE account a SET a.money = a.money + ? WHERE a.id = ?";
+    private static final String SQL_UPDATE_BALANCE = "UPDATE account a SET a.money = ? WHERE a.id = ?";
 
     private DataSource dataSource;
 
@@ -57,11 +56,11 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public boolean updateBalance(long accountId, BigDecimal changeByAmount) throws RepositoryException {
+    public boolean updateBalance(long accountId, BigDecimal updatedBalance) throws RepositoryException {
         PreparedStatement statement = null;
         try (Connection con = dataSource.getConnection()) {
             statement = con.prepareStatement(SQL_UPDATE_BALANCE);
-            statement.setBigDecimal(1, changeByAmount);
+            statement.setBigDecimal(1, updatedBalance);
             statement.setLong(2, accountId);
             return statement.executeUpdate() == 1;
         } catch (SQLException e) {
